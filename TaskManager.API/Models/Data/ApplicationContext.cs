@@ -5,10 +5,6 @@ using TaskManager.Common.Models;
 
 namespace TaskManager.API.Models.Data
 {
-
-    /// <summary>
-    /// Summary description for Class1
-    /// </summary>
     public class ApplicationContext : DbContext
     {
         // Таблицы
@@ -19,18 +15,17 @@ namespace TaskManager.API.Models.Data
         public DbSet<Task> Tasks { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
-            // Бд существует
+            //Database.EnsureDeleted();
             Database.EnsureCreated();
 
+            // TODO: убрать заглушку
             // Если нет ни одного админа
-            if (Users.Any(u=>u.Status == UserStatus.Admin) == false)
+            if (Users.Any(u => u.Status == UserStatus.Admin) == false)
             {
-                var admin = new User("rar", "24", "admin", "12345", UserStatus.Admin);
+                var admin = new User("admin", "24", "admin@mail.ru", "12345", UserStatus.Admin);
                 Users.Add(admin);
                 SaveChanges();
             }
         }
-
-
     }
 }

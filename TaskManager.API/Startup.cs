@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+п»їusing Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,9 +31,9 @@ namespace TaskManager.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Получение строки подключения
+            // РџРѕР»СѓС‡РµРЅРёРµ СЃС‚СЂРѕРєРё РїРѕРґРєР»СЋС‡РµРЅРёСЏ
             string connection = Configuration.GetConnectionString("DefaultConnection");
-            // Добавление контекста базы данных ApplicationContext
+            // Р”РѕР±Р°РІР»РµРЅРёРµ РєРѕРЅС‚РµРєСЃС‚Р° Р±Р°Р·С‹ РґР°РЅРЅС‹С… ApplicationContext
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -42,21 +42,21 @@ namespace TaskManager.API
                     options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        // указывает, будет ли валидироваться издатель при валидации токена
+                        // СѓРєР°Р·С‹РІР°РµС‚, Р±СѓРґРµС‚ Р»Рё РІР°Р»РёРґРёСЂРѕРІР°С‚СЊСЃСЏ РёР·РґР°С‚РµР»СЊ РїСЂРё РІР°Р»РёРґР°С†РёРё С‚РѕРєРµРЅР°
                         ValidateIssuer = true,
-                        // строка, представляющая издателя
+                        // СЃС‚СЂРѕРєР°, РїСЂРµРґСЃС‚Р°РІР»СЏСЋС‰Р°СЏ РёР·РґР°С‚РµР»СЏ
                         ValidIssuer = AuthOptions.ISSUER,
 
-                        // будет ли валидироваться потребитель токена
+                        // Р±СѓРґРµС‚ Р»Рё РІР°Р»РёРґРёСЂРѕРІР°С‚СЊСЃСЏ РїРѕС‚СЂРµР±РёС‚РµР»СЊ С‚РѕРєРµРЅР°
                         ValidateAudience = true,
-                        //установка потребителя токена
+                        //СѓСЃС‚Р°РЅРѕРІРєР° РїРѕС‚СЂРµР±РёС‚РµР»СЏ С‚РѕРєРµРЅР°
                         ValidAudience = AuthOptions.AUDIENCE,
-                        // будет ли валидироваться время существования
+                        // Р±СѓРґРµС‚ Р»Рё РІР°Р»РёРґРёСЂРѕРІР°С‚СЊСЃСЏ РІСЂРµРјСЏ СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёСЏ
                         ValidateLifetime = true,
 
-                        // установка ключа безопасности
+                        // СѓСЃС‚Р°РЅРѕРІРєР° РєР»СЋС‡Р° Р±РµР·РѕРїР°СЃРЅРѕСЃС‚Рё
                         IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                        // валидация ключа безопасности
+                        // РІР°Р»РёРґР°С†РёСЏ РєР»СЋС‡Р° Р±РµР·РѕРїР°СЃРЅРѕСЃС‚Рё
                         ValidateIssuerSigningKey = true,
                     };
                 });

@@ -14,7 +14,7 @@ namespace TaskManager.API.Models
         public string Phone { get; set; }
         public DateTime RegistrationDate { get; set; }
         public DateTime LastLoginDate { get; set; }
-        public byte[] Photo { get; set; }
+        //public byte[] Photo { get; set; }
         // Связь многие ко многим
         public List<Project> Projects { get; set; } = new List<Project>();
         public List<Desk> Desks { get; set; } = new List<Desk>();
@@ -22,10 +22,7 @@ namespace TaskManager.API.Models
         // Перечисления
         public UserStatus Status { get; set; }
 
-
-        public User()
-        {
-        }
+        public User() { }
 
         public User(
             string fname,

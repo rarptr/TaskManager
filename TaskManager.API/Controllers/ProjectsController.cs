@@ -77,7 +77,7 @@ namespace TaskManager.API.Controllers
             return BadRequest();
         }
 
-        [HttpPatch]
+        [HttpPatch("{id}")]
         public IActionResult Update(int id, [FromBody] ProjectModel projectModel)
         {
             if (projectModel != null)
@@ -98,7 +98,7 @@ namespace TaskManager.API.Controllers
             return BadRequest();
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             bool result = _projectsService.Delete(id);
@@ -142,6 +142,5 @@ namespace TaskManager.API.Controllers
             }
             return BadRequest();
         }
-
     }
 }

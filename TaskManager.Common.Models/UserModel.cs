@@ -26,16 +26,14 @@ namespace TaskManager.Common.Models
             string lname,
             string email,
             string password,
-            UserStatus status /*= UserStatus.User*/,
-            string phone/* = null*/
-/*            byte[] photo = null*/)
+            UserStatus status,
+            string phone)
         {
             FirstName = fname;
             LastName = lname;
             Email = email;
             Password = password;
             Phone = phone;
-            //Photo = photo;
             RegistrationDate = DateTime.Now;
             Status = status;
         }

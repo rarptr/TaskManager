@@ -52,7 +52,7 @@ namespace TaskManager.API.Models.Services
                 Project newProject = _db.Projects.FirstOrDefault(p => p.Id == id);
                 newProject.Name = newProject.Name;
                 newProject.Description = newProject.Description;
-                newProject.Photo = newProject.Photo;
+                //newProject.Photo = newProject.Photo;
                 newProject.Status = newProject.Status;
                 newProject.AdminId = newProject.AdminId;
 
@@ -80,7 +80,9 @@ namespace TaskManager.API.Models.Services
             var admin = _db.ProjectAdmins.FirstOrDefault(a => a.UserId == userId);
             if (admin != null)
             {
-                var projectsForAdmin = await _db.Projects.Where(p => p.AdminId == admin.Id).Select(p => p.ToDto()).ToListAsync();
+                var projectsForAdmin = await _db.Projects.Where(p => p.AdminId == admin.Id)
+                                                         .Select(p => p.ToDto())
+                                                         .ToListAsync();
                 result.AddRange(projectsForAdmin);
             }
             var projectsForUser = await _db.Projects.Include(p => p.AllUsers)
@@ -103,7 +105,6 @@ namespace TaskManager.API.Models.Services
             _db.SaveChanges();
         }
 
-
         public void RemoveUsersFromProject(int id, List<int> userIds)
         {
             Project project = _db.Projects.Include(p => p.AllUsers).FirstOrDefault(p => p.Id == id);
@@ -118,7 +119,5 @@ namespace TaskManager.API.Models.Services
             }
             _db.SaveChanges();
         }
-
-
     }
 }

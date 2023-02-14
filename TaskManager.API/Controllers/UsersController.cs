@@ -33,7 +33,6 @@ namespace TaskManager.API.Controllers
             return Ok($"Server is running. {DateTime.Now}");
         }
 
-
         [HttpPost]
         public IActionResult CreateUser([FromBody] UserModel userModel)
         {
@@ -79,6 +78,5 @@ namespace TaskManager.API.Controllers
             }
             return BadRequest();
         }
-
     }
 }

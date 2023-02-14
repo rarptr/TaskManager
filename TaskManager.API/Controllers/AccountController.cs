@@ -42,6 +42,7 @@ namespace TaskManager.API.Controllers
             var userData = _userService.GetUserLoginPassFromBasicAuth(Request);
             var login = userData.Item1;
             var pass = userData.Item2;
+            // TODO: обработать ситуацию при которой данный пользователь не существует
             var identity = _userService.GetIdentity(login, pass);
 
             var now = DateTime.UtcNow;
@@ -67,7 +68,6 @@ namespace TaskManager.API.Controllers
         [HttpPatch("update")]
         public IActionResult UpdateUser([FromBody] UserModel userModel)
         {
-
             if (userModel != null)
             {
                 string userName = HttpContext.User.Identity.Name;
@@ -88,7 +88,5 @@ namespace TaskManager.API.Controllers
             }
             return BadRequest();
         }
-
-
     }
 }
