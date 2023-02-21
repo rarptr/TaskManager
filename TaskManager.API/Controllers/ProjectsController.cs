@@ -29,7 +29,7 @@ namespace TaskManager.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<ProjectModel>> Get()
+        public async Task<IEnumerable<CommonModel>> Get()
         {
             var user = _usersService.GetUser(HttpContext.User.Identity.Name);
             if (user.Status == UserStatus.Admin)
@@ -60,11 +60,13 @@ namespace TaskManager.API.Controllers
                     // Жёсткая привязка
                     if (user.Status == UserStatus.Admin || user.Status == UserStatus.Editor)
                     {
+                        // TODO: вынести в сервис
                         var admin = _db.ProjectAdmins.FirstOrDefault(a => a.UserId == user.Id);
                         if (admin == null)
                         {
                             admin = new ProjectAdmin(user);
                             _db.ProjectAdmins.Add(admin);
+                            _db.SaveChanges();
                         }
                         projectModel.AdminId = admin.Id;
 
@@ -88,6 +90,7 @@ namespace TaskManager.API.Controllers
                     // Жёсткая привязка
                     if (user.Status == UserStatus.Admin || user.Status == UserStatus.Editor)
                     {
+                        // TODO: Пофиксить затирание adminId
                         bool result = _projectsService.Update(id, projectModel);
                         return result ? Ok() : NotFound();
                     }

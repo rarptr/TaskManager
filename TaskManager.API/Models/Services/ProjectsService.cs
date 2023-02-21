@@ -49,14 +49,14 @@ namespace TaskManager.API.Models.Services
         {
             bool result = DoAction(delegate ()
             {
-                Project newProject = _db.Projects.FirstOrDefault(p => p.Id == id);
-                newProject.Name = newProject.Name;
-                newProject.Description = newProject.Description;
-                //newProject.Photo = newProject.Photo;
-                newProject.Status = newProject.Status;
-                newProject.AdminId = newProject.AdminId;
+                Project project = _db.Projects.FirstOrDefault(p => p.Id == id);
+                project.Name = model.Name;
+                project.Description = model.Description;
+                project.Photo = model.Photo;
+                project.Status = model.Status;
+                project.AdminId = model.AdminId;
 
-                _db.Projects.Update(newProject);
+                _db.Projects.Update(project);
                 _db.SaveChanges();
             });
 
@@ -65,13 +65,21 @@ namespace TaskManager.API.Models.Services
 
         public ProjectModel Get(int id)
         {
-            Project project = _db.Projects.FirstOrDefault(x => x.Id == id);
-            return project.ToDto();
+            Project project = _db.Projects.Include(p => p.AllUsers).Include(p=>p.AllDesks).FirstOrDefault(x => x.Id == id);
+            var projectModel = project?.ToDto();
+
+            if (projectModel != null)
+            {
+                projectModel.AllUsersIds = project.AllUsers.Select(u => u.Id).ToList();
+                projectModel.AllDesksIds = project.AllDesks.Select(u => u.Id).ToList();
+            }
+
+            return projectModel;
         }
 
-        public IQueryable<ProjectModel> GetAll()
+        public IQueryable<CommonModel> GetAll()
         {
-            return _db.Projects.Select(x => x.ToDto());
+            return _db.Projects.Select(x => x.ToDto() as CommonModel);
         }
 
         public async Task<IEnumerable<ProjectModel>> GetByUserId(int userId)
@@ -99,8 +107,10 @@ namespace TaskManager.API.Models.Services
             foreach (int userId in userIds)
             {
                 var user = _db.Users.FirstOrDefault(u => u.Id == userId);
-                project.AllUsers.Add(user);
-
+                if (project.AllUsers.Contains(user) == false)
+                {
+                    project.AllUsers.Add(user);
+                }
             }
             _db.SaveChanges();
         }
