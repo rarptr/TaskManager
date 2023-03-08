@@ -29,11 +29,10 @@ namespace TaskManager.API.Controllers
         [HttpGet("info")]
         public IActionResult GetCurrentUserInfo()
         {
-            string username = HttpContext.User.Identity.Name;
-            var user = _db.Users.FirstOrDefault(u => u.Email == username);
-            if (user != null)
-                return Ok(user.ToDto());
-            return NotFound();
+            string userName = HttpContext.User.Identity.Name;
+            var user = _db.Users.FirstOrDefault(u => u.Email == userName);
+
+            return user == null ? NotFound() : Ok(user.ToDto());
         }
 
         [HttpPost("token")]
@@ -68,25 +67,27 @@ namespace TaskManager.API.Controllers
         [HttpPatch("update")]
         public IActionResult UpdateUser([FromBody] UserModel userModel)
         {
-            if (userModel != null)
+            if (userModel == null)
             {
-                string userName = HttpContext.User.Identity.Name;
-                User userForUpdate = _db.Users.FirstOrDefault(u => u.Email == userName);
+                return BadRequest();
+            }
 
-                if (userForUpdate != null)
-                {
-                    userForUpdate.FirstName = userModel.FirstName;
-                    userForUpdate.LastName = userModel.LastName;
-                    userForUpdate.Password = userModel.Password;
-                    userForUpdate.Phone = userModel.Phone;
-                    userForUpdate.Photo = userModel.Photo;
-                    _db.Users.Update(userForUpdate);
-                    _db.SaveChanges();
-                    return Ok();
-                }
+            string userName = HttpContext.User.Identity.Name;
+            User userForUpdate = _db.Users.FirstOrDefault(u => u.Email == userName);
+            if (userForUpdate == null)
+            {
                 return NotFound();
             }
-            return BadRequest();
+
+            userForUpdate.FirstName = userModel.FirstName;
+            userForUpdate.LastName = userModel.LastName;
+            userForUpdate.Password = userModel.Password;
+            userForUpdate.Phone = userModel.Phone;
+            userForUpdate.Photo = userModel.Photo;
+
+            _db.Users.Update(userForUpdate);
+            _db.SaveChanges();
+            return Ok();
         }
     }
 }

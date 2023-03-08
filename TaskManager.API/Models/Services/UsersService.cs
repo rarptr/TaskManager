@@ -47,6 +47,21 @@ namespace TaskManager.API.Models.Services
             return user;
         }
 
+        public UserModel Get(int id)
+        {
+            User user = _db.Users.FirstOrDefault(u => u.Id == id);
+            return user?.ToDto();
+        }
+
+        public IEnumerable<UserModel> GetAllByIds(List<int> usersIds)
+        {
+            foreach (int id in usersIds)
+            {
+                var user = _db.Users.FirstOrDefault(u => u.Id == id).ToDto();
+                yield return user;
+            }
+        }
+
         public ClaimsIdentity GetIdentity(string username, string password)
         {
             User currentUser = GetUser(username, password);
@@ -72,41 +87,37 @@ namespace TaskManager.API.Models.Services
 
         public bool Create(UserModel model)
         {
-            try
+            return DoAction(delegate ()
             {
                 User newUser = new User(
                     model.FirstName, model.LastName, model.Email, model.Password, model.Status, model.Phone, model.Photo);
 
                 _db.Users.Add(newUser);
                 _db.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            });
         }
 
         public bool Update(int id, UserModel model)
         {
             User userForUpdate = _db.Users.FirstOrDefault(u => u.Id == id);
-            if (userForUpdate != null)
+            if (userForUpdate == null)
             {
-                DoAction(delegate ()
-                {
-                    userForUpdate.FirstName = model.FirstName;
-                    userForUpdate.LastName = model.LastName;
-                    userForUpdate.Password = model.Password;
-                    userForUpdate.Phone = model.Phone;
-                    userForUpdate.Photo = model.Photo;
-                    userForUpdate.Status = model.Status;
-                    userForUpdate.Email = model.Email;
-
-                    _db.Users.Update(userForUpdate);
-                    _db.SaveChanges();
-                });
+                return false;
             }
-            return false;
+
+            return DoAction(delegate ()
+            {
+                userForUpdate.FirstName = model.FirstName;
+                userForUpdate.LastName = model.LastName;
+                userForUpdate.Password = model.Password;
+                userForUpdate.Phone = model.Phone;
+                userForUpdate.Photo = model.Photo;
+                userForUpdate.Status = model.Status;
+                userForUpdate.Email = model.Email;
+
+                _db.Users.Update(userForUpdate);
+                _db.SaveChanges();
+            });
         }
 
         public bool Delete(int id)
@@ -131,21 +142,6 @@ namespace TaskManager.API.Models.Services
                 _db.Users.AddRange(newUsers);
                 _db.SaveChanges();
             });
-        }
-
-        public UserModel Get(int id)
-        {
-            User user = _db.Users.FirstOrDefault(u => u.Id == id);
-            return user?.ToDto();
-        }
-
-        public IEnumerable<UserModel> GetAllByIds(List<int> usersIds)
-        {
-            foreach (int id in usersIds)
-            {
-                var user = _db.Users.FirstOrDefault(u => u.Id == id).ToDto();
-                yield return user;
-            }
         }
     }
 }

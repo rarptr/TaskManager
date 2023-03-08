@@ -15,34 +15,13 @@ namespace TaskManager.API.Controllers
     [ApiController]
     public class TasksController : ControllerBase
     {
-        private readonly ApplicationContext _db;
         private readonly UsersService _usersService;
         private readonly TasksService _tasksService;
 
         public TasksController(ApplicationContext db)
         {
-            _db = db;
             _usersService = new UsersService(db);
             _tasksService = new TasksService(db);
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<CommonModel>>> GetTasksByDesk(int deskId)
-        {
-            var result = await _tasksService.GetAll(deskId).ToListAsync();
-            return result == null ? NoContent() : Ok(result); 
-        }
-
-        [HttpGet("user")]
-        public async Task<ActionResult<IEnumerable<TaskModel>>> GetTasksForCurrentUser()
-        {
-            var user = _usersService.GetUser(HttpContext.User.Identity.Name);
-            if (user != null)
-            {
-                var result = await _tasksService.GetTasksForUser(user.Id).ToListAsync();
-                return result == null ? NoContent() : Ok(result);
-            }
-            return Unauthorized(Array.Empty<TaskModel>());
         }
 
         [HttpGet("{id}")]
@@ -52,37 +31,61 @@ namespace TaskManager.API.Controllers
             return task == null ? NotFound() : Ok(task);
         }
 
+        [HttpGet("user")]
+        public async Task<ActionResult<IEnumerable<TaskModel>>> GetTasksForCurrentUser()
+        {
+            var user = _usersService.GetUser(HttpContext.User.Identity.Name);
+            if (user == null)
+            {
+                return Unauthorized(Array.Empty<TaskModel>());
+            }
+
+            var result = await _tasksService.GetTasksForUser(user.Id).ToListAsync();
+            return result == null ? NoContent() : Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CommonModel>>> GetTasksByDesk(int deskId)
+        {
+            var result = await _tasksService.GetAll(deskId).ToListAsync();
+            return result == null ? NoContent() : Ok(result);
+        }
+
         [HttpPost]
         public IActionResult Create([FromBody] TaskModel model)
         {
             var user = _usersService.GetUser(HttpContext.User.Identity.Name);
-            if (user != null)
+            if (user == null)
             {
-                if (model != null)
-                {
-                    model.CreatorId = user.Id;
-                    bool result = _tasksService.Create(model);
-                    return result ? Ok() : NotFound();
-                }
+                return Unauthorized();
+            }
+
+            if (model == null)
+            {
                 return BadRequest();
             }
-            return Unauthorized();
+            model.CreatorId = user.Id;
+
+            bool result = _tasksService.Create(model);
+            return result ? Ok() : NotFound();
         }
 
         [HttpPatch("{id}")]
         public IActionResult Update(int id, [FromBody] TaskModel model)
         {
             var user = _usersService.GetUser(HttpContext.User.Identity.Name);
-            if (user != null)
+            if (user == null)
             {
-                if (model != null)
-                {
-                    bool result = _tasksService.Update(id, model);
-                    return result ? Ok() : NotFound();
-                }
+                return Unauthorized();
+            }
+
+            if (model == null)
+            {
                 return BadRequest();
             }
-            return Unauthorized();
+
+            bool result = _tasksService.Update(id, model);
+            return result ? Ok() : NotFound();
         }
 
         [HttpDelete("{id}")]

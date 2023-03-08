@@ -26,33 +26,46 @@ namespace TaskManager.API.Controllers
             _usersService = new UsersService(db);
         }
 
-        [AllowAnonymous]
-        [HttpGet("test")]
-        public IActionResult TestApi()
+        [HttpGet]
+        public async Task<IEnumerable<UserModel>> GetUsers()
         {
-            return Ok($"Server is running. {DateTime.Now}");
+            return await _db.Users.Select(u => u.ToDto()).ToListAsync();
         }
 
         [HttpPost]
         public IActionResult CreateUser([FromBody] UserModel userModel)
         {
-            if (userModel != null)
+            if (userModel == null)
             {
-                var res = _usersService.Create(userModel);
-                return res ? Ok() : NotFound();
+                return BadRequest();
             }
-            return BadRequest(); // 400
+
+            var res = _usersService.Create(userModel);
+            return res ? Ok() : NotFound();
+        }
+
+        [HttpPost("all")]
+        public IActionResult CreateMultipleUsers([FromBody] List<UserModel> userModels)
+        {
+            if (userModels == null || userModels.Count <= 0)
+            {
+                return BadRequest();
+            }
+
+            var res = _usersService.CreateMultipleUsers(userModels);
+            return res ? Ok() : NotFound();
         }
 
         [HttpPatch("{id}")]
         public IActionResult UpdateUser(int id, [FromBody] UserModel userModel)
         {
-            if (userModel != null)
+            if (userModel == null)
             {
-                var res = _usersService.Update(id, userModel);
-                return res ? Ok() : NotFound();
+                return BadRequest();
             }
-            return BadRequest();
+
+            var res = _usersService.Update(id, userModel);
+            return res ? Ok() : NotFound();
         }
 
         [HttpDelete("{id}")]
@@ -62,21 +75,11 @@ namespace TaskManager.API.Controllers
             return res ? Ok() : NotFound();
         }
 
-        [HttpGet]
-        public async Task<IEnumerable<UserModel>> GetUsers()
+        [AllowAnonymous]
+        [HttpGet("test")]
+        public IActionResult TestApi()
         {
-            return await _db.Users.Select(u => u.ToDto()).ToListAsync();
-        }
-
-        [HttpPost("all")]
-        public async Task<IActionResult> CreateMultipleUsers([FromBody] List<UserModel> userModels)
-        {
-            if (userModels != null && userModels.Count > 0)
-            {
-                var res = _usersService.CreateMultipleUsers(userModels);
-                return res ? Ok() : NotFound();
-            }
-            return BadRequest();
+            return Ok($"Server is running. {DateTime.Now}");
         }
     }
 }

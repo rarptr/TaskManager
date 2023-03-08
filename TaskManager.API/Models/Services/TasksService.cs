@@ -15,28 +15,6 @@ namespace TaskManager.API.Models.Services
             _db = db;
         }
 
-        public bool Create(TaskModel model)
-        {
-            bool result = DoAction(delegate ()
-            {
-                Task newTask = new Task(model);
-                _db.Tasks.Add(newTask);
-                _db.SaveChanges();
-            });
-            return result;
-        }
-
-        public bool Delete(int id)
-        {
-            bool result = DoAction(delegate ()
-            {
-                Task task = _db.Tasks.FirstOrDefault(t => t.Id == id);
-                _db.Tasks.Remove(task);
-                _db.SaveChanges();
-            });
-            return result;
-        }
-
         public TaskModel Get(int id)
         {
             Task task = _db.Tasks.FirstOrDefault(t => t.Id == id);
@@ -49,13 +27,27 @@ namespace TaskManager.API.Models.Services
                             .Select(t => t.ToShortDto());
         }
 
+        public IQueryable<CommonModel> GetAll(int deskId)
+        {
+            return _db.Tasks.Where(t => t.DeskId == deskId).Select(t => t.ToShortDto());
+        }
+
+        public bool Create(TaskModel model)
+        {
+            bool result = DoAction(delegate ()
+            {
+                Task newTask = new Task(model);
+                _db.Tasks.Add(newTask);
+                _db.SaveChanges();
+            });
+            return result;
+        }
 
         public bool Update(int id, TaskModel model)
         {
             bool result = DoAction(delegate ()
             {
                 Task task = _db.Tasks.FirstOrDefault(t => t.Id == id);
-
                 task.Name = model.Name;
                 task.Description = model.Description;
                 task.Photo = model.Photo;
@@ -73,9 +65,15 @@ namespace TaskManager.API.Models.Services
             return result;
         }
 
-        public IQueryable<CommonModel> GetAll(int deskId)
+        public bool Delete(int id)
         {
-            return _db.Tasks.Where(t => t.DeskId == deskId).Select(t => t.ToShortDto());
+            bool result = DoAction(delegate ()
+            {
+                Task task = _db.Tasks.FirstOrDefault(t => t.Id == id);
+                _db.Tasks.Remove(task);
+                _db.SaveChanges();
+            });
+            return result;
         }
     }
 }

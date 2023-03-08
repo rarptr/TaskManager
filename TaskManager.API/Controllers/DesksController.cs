@@ -25,6 +25,13 @@ namespace TaskManager.API.Controllers
             _desksService = new DesksService(db);
         }
 
+        [HttpGet("{id}")]
+        public IActionResult Get(int id)
+        {
+            var desk = _desksService.Get(id);
+            return desk == null ? NotFound() : Ok(desk);
+        }
+
         [HttpGet]
         public async Task<IEnumerable<CommonModel>> GetDesksForCurrentUser()
         {
@@ -34,14 +41,6 @@ namespace TaskManager.API.Controllers
                 return await _desksService.GetAll(user.Id).ToListAsync();
             }
             return Array.Empty<CommonModel>();
-        }
-
-
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
-        {
-            var desk = _desksService.Get(id);
-            return desk == null ? NotFound() : Ok(desk);
         }
 
         [HttpGet("project")]
@@ -59,33 +58,36 @@ namespace TaskManager.API.Controllers
         public IActionResult Create([FromBody] DeskModel deskModel)
         {
             var user = _usersService.GetUser(HttpContext.User.Identity.Name);
-            if (user != null)
+            if (user == null)
             {
-                if (deskModel != null)
-                {
-                    bool result = _desksService.Create(deskModel);
-                    return result ? Ok() : NotFound();
-                }
+                return Unauthorized();
+            }
+
+            if (deskModel == null)
+            {
                 return BadRequest();
             }
-            return Unauthorized();
+
+            bool result = _desksService.Create(deskModel);
+            return result ? Ok() : NotFound();
         }
 
         [HttpPatch("{id}")]
         public IActionResult Update(int id, [FromBody] DeskModel deskModel)
         {
             var user = _usersService.GetUser(HttpContext.User.Identity.Name);
-            if (user != null)
+            if (user == null)
             {
-                if (deskModel != null)
-                {
-                    bool result = _desksService.Update(id, deskModel);
-                    return result ? Ok() : NotFound();
+                return Unauthorized();
+            }
 
-                }
+            if (deskModel == null)
+            {
                 return BadRequest();
             }
-            return Unauthorized();
+
+            bool result = _desksService.Update(id, deskModel);
+            return result ? Ok() : NotFound();
         }
 
         [HttpDelete("{id}")]
@@ -94,6 +96,5 @@ namespace TaskManager.API.Controllers
             bool result = _desksService.Delete(id);
             return result ? Ok() : NotFound();
         }
-
     }
 }
