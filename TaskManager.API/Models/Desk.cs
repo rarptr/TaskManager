@@ -34,6 +34,18 @@ namespace TaskManager.API.Models
             }
         }
 
+        public CommonModel ToShortDto()
+        {
+            return new CommonModel()
+            {
+                Id = this.Id,
+                Name = this.Name,
+                Description = this.Description,
+                CreationDate = this.CreationDate,
+                Photo = this.Photo,
+            };
+        }
+
         public DeskModel ToDto()
         {
             return new DeskModel()

@@ -51,6 +51,7 @@ namespace TaskManager.API.Models.Services
             }
             return deskModel;
         }
+
         public bool Update(int id, DeskModel model)
         {
             bool result = DoAction(delegate ()
@@ -61,7 +62,7 @@ namespace TaskManager.API.Models.Services
                 desk.Photo = model.Photo;
                 desk.AdminId = model.AdminId;
                 desk.IsPrivate = model.IsPrivate;
-                desk.ProjectId = model.ProjectId;
+                //desk.ProjectId = model.ProjectId;
                 desk.Columns = JsonConvert.SerializeObject(model.Columns);
 
                 _db.Desks.Update(desk);
@@ -73,13 +74,13 @@ namespace TaskManager.API.Models.Services
 
         public IQueryable<CommonModel> GetAll(int userId)
         {
-            return _db.Desks.Where(d => d.AdminId == userId).Select(d => d.ToDto() as CommonModel);
+            return _db.Desks.Where(d => d.AdminId == userId).Select(d => d.ToShortDto());
         }
 
         public IQueryable<CommonModel> GetProjectDesks(int projectId, int userId)
         {
             return _db.Desks.Where(d => (d.ProjectId == projectId && 
-                (d.AdminId == userId || d.IsPrivate == false))).Select(d => d.ToDto() as CommonModel);
+                (d.AdminId == userId || d.IsPrivate == false))).Select(d => d.ToShortDto());
         }
 
     }
